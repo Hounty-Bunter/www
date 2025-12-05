@@ -1,0 +1,145 @@
+/* =========================
+   DASHBOARD POLISH PATCH
+   Paste at END of styles.css
+   ========================= */
+
+/* 1) Dashboard container: cleaner, more depth */
+.dashboard-container{
+    background: rgba(255,255,255,0.97);
+    border: 1px solid rgba(17,24,39,0.06);
+    box-shadow:
+      0 20px 50px rgba(0,0,0,0.10),
+      0 2px 8px rgba(0,0,0,0.04);
+  }
+  
+  /* 2) Welcome typography */
+  .welcome-section h1{
+    font-weight: 700;
+    letter-spacing: -1px;
+    background: linear-gradient(90deg,#4f46e5,#7c3aed);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .welcome-section p{
+    font-size: 1.05rem;
+  }
+  
+  /* 3) User-info card spacing */
+  .user-info{
+    padding: 28px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(99,102,241,0.12);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+  }
+  
+  /* 4) Profile card look */
+  .profile{
+    border-radius: 16px;
+    padding: 18px;
+    background:
+      radial-gradient(1200px 400px at -10% -30%, rgba(99,102,241,0.08), transparent 60%),
+      #fff;
+    border: 1px solid rgba(17,24,39,0.06);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.05);
+  }
+  
+  .avatar{
+    width: 76px;
+    height: 76px;
+    border-radius: 14px; /* همون رُند خودت ولی خوشگل‌تر */
+    border: 3px solid #fff;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .avatar:hover{
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 16px 30px rgba(0,0,0,0.16);
+  }
+  
+  /* 5) Inputs: slightly softer + consistent */
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group input[type="password"]{
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .form-group input:focus{
+    border-color:#6366f1;
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+  }
+  
+  /* 6) Custom nice file input WITHOUT JS
+        We hide the ugly native button and style it */
+  .form-group input[type="file"]{
+    padding: 0;
+    border: 1.5px dashed #c7d2fe;
+    background: #f8fafc;
+    border-radius: 12px;
+    height: 54px;
+    font-size: 0.95rem;
+    color: #111827;
+    cursor: pointer;
+    transition: all .18s ease;
+  }
+  
+  /* style the browse button */
+  .form-group input[type="file"]::file-selector-button{
+    height: 52px;
+    margin-right: 12px;
+    border: 0;
+    padding: 0 16px;
+    border-radius: 10px 0 0 10px;
+    background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter .18s ease, transform .18s ease;
+  }
+  .form-group input[type="file"]::file-selector-button:hover{
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+  
+  .form-group input[type="file"]:hover{
+    border-color:#6366f1;
+    background:#fff;
+    box-shadow: 0 6px 14px rgba(99,102,241,0.10);
+  }
+  
+  /* small helper text */
+  .form-group small{
+    color:#6b7280 !important;
+    font-size: .88rem;
+  }
+  
+  /* 7) primary button more modern */
+  .submit-btn{
+    border-radius: 12px;
+    font-weight: 800;
+    letter-spacing: .2px;
+    box-shadow: 0 10px 24px rgba(102,126,234,0.28);
+  }
+  .submit-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(102,126,234,0.35);
+  }
+  
+  /* 8) Logout link aligns better with your design */
+  .logout-link{
+    border-radius: 12px;
+    font-weight: 800;
+    letter-spacing: .2px;
+    box-shadow: 0 10px 22px rgba(239,68,68,0.25);
+  }
+  
+  /* 9) Mobile tweaks */
+  @media (max-width:520px){
+    .user-info{ padding: 20px !important; }
+    .profile{ padding: 16px; }
+    .avatar{ width: 70px; height: 70px; }
+  }
+  

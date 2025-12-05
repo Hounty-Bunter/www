@@ -1,0 +1,6 @@
+{
+    "require": {
+        "google/apiclient": "^2.0",
+        "resend/resend-php": "^1.0"
+    }
+}
