@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 
 const getLoginEndpoint = () => {
   // Use env-provided API base when available; otherwise default to same-origin path
-  const envBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const envBase =
+    process.env.NEXT_PUBLIC_API_BASE_URL || "http://admin.hountybunter.click/api";
   if (envBase) {
     return `${envBase.replace(/\/$/, "")}/login`;
   }
