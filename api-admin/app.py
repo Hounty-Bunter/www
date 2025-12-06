@@ -15,8 +15,8 @@ def login():
     password = payload.get("password")
 
     # Simple demo check; replace with real auth as needed.
-    if username == "test" and password == "test":
-        return jsonify({"msg": "ok", "status": 200, "token": "token_test_test"}), 200
+    if username == "admin" and password == "password123":
+        return jsonify({"msg": "ok", "status": 200, "token": "TOKEN"}), 200
 
     return jsonify({"msg": "wrong u p", "status": 401, "token": None}), 401
 
