@@ -28,8 +28,10 @@ export default function LoginPage() {
 
       const data = await response.json();
 
-      if (response.ok && data?.status === 200) {
-        localStorage.setItem("token", data.token);
+      if (response.ok && data?.status === 200 && data?.msg === "ok") {
+        if (data?.token) {
+          localStorage.setItem("token", data.token);
+        }
         router.push("/panel");
         return;
       }
