@@ -46,48 +46,61 @@ export default function Login() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-      <section className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg ring-1 ring-gray-200">
-        <div className="mb-6 space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Admin</p>
-          <h1 className="text-2xl font-semibold text-gray-900">Login</h1>
-          <p className="text-sm text-gray-600">Enter your credentials to access the panel.</p>
+     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-800 to-black px-4 text-zinc-50">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-10 shadow-2xl backdrop-blur">
+        <div className="mb-8 space-y-2 text-center">
+          <p className="text-sm uppercase tracking-[0.2em] text-amber-400">
+            Admin Access
+          </p>
+          <h1 className="text-3xl font-semibold leading-tight">Sign in</h1>
+          <p className="text-sm text-zinc-400">
+            Enter your credentials to continue to the panel.
+          </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <label className="block space-y-1">
-            <span className="text-sm font-medium text-gray-700">Username</span>
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          <label className="block space-y-2">
+            <span className="text-sm text-zinc-200">Username</span>
             <input
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              type="text"
+              className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none ring-amber-400/60 transition focus:border-amber-400/60 focus:ring-2"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter username"
               required
+              autoComplete="username"
             />
           </label>
 
-          <label className="block space-y-1">
-            <span className="text-sm font-medium text-gray-700">Password</span>
+          <label className="block space-y-2">
+            <span className="text-sm text-zinc-200">Password</span>
             <input
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
               type="password"
+              className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none ring-amber-400/60 transition focus:border-amber-400/60 focus:ring-2"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
               required
+              autoComplete="current-password"
             />
           </label>
 
-          {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">{error}</p>}
+          {error ? (
+            <p className="text-sm font-medium text-amber-300">{error}</p>
+          ) : null}
 
           <button
-            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-blue-300"
             type="submit"
             disabled={loading}
+            className="flex w-full items-center justify-center rounded-lg bg-amber-400 px-4 py-3 text-sm font-semibold text-black transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:bg-amber-200"
           >
-            {loading ? 'Signing in…' : 'Login'}
+            {loading ? "Signing in..." : "Login"}
           </button>
         </form>
-      </section>
-    </main>
-  );
+
+        <div className="mt-8 rounded-lg border border-white/5 bg-white/5 p-4 text-xs text-zinc-400">
+          <p>Demo credentials:</p>
+          <p className="mt-1 font-semibold text-white">admin / password123</p>
+        </div>
+      </div>
+    </div>
 }
