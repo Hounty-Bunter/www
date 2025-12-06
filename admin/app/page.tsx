@@ -1,118 +1,115 @@
-"use client";
+'use client';
 
-import { FormEvent, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-const getLoginEndpoint = () => {
-  // Use env-provided API base when available; otherwise default to same-origin path
-  const envBase =
-    process.env.NEXT_PUBLIC_API_BASE_URL || "http://admin.hountybunter.click/api";
-  if (envBase) {
-    return `${envBase.replace(/\/$/, "")}/login`;
-  }
-  if (typeof window !== "undefined") {
-    return `${window.location.origin}/login`;
-  }
-  return "/login";
+type LoginResponse = {
+  status?: number;
+  token?: string;
+  msg?: string;
 };
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const loginEndpoint = useMemo(() => getLoginEndpoint(), []);
+function TextField({
+  label,
+  type = 'text',
+  value,
+  onChange,
+}: {
+  label: string;
+  type?: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block space-y-1">
+      <span className="text-sm font-semibold text-slate-100/90">{label}</span>
+      <input
+        className="w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm text-white shadow-inner outline-none transition focus:-translate-y-[1px] focus:border-cyan-300 focus:ring-2 focus:ring-cyan-200/50 placeholder:text-white/50"
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required
+      />
+    </label>
+  );
+}
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+export default function Login() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
     setLoading(true);
-    setError(null);
 
     try {
-      const response = await fetch(loginEndpoint, {
-        method: "POST",
+      const response = await fetch('/api/login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as LoginResponse;
 
-      if (response.ok && data?.status === 200 && data?.msg === "ok") {
-        if (data?.token) {
-          localStorage.setItem("token", data.token);
-        }
-        router.push("/panel");
-        return;
+      if (data.status === 200 && data.token) {
+        localStorage.setItem('token', data.token);
+        router.push('/panel');
+      } else {
+        setError(data.msg || 'Login failed');
       }
-
-      setError(data?.msg || "wrong u p");
     } catch (err) {
-      setError("Unable to reach server. Please try again.");
+      setError('Connection error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-800 to-black px-4 text-zinc-50">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-10 shadow-2xl backdrop-blur">
-        <div className="mb-8 space-y-2 text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-amber-400">
-            Admin Access
-          </p>
-          <h1 className="text-3xl font-semibold leading-tight">Sign in</h1>
-          <p className="text-sm text-zinc-400">
-            Enter your credentials to continue to the panel.
-          </p>
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-black px-4">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.2),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(34,211,238,0.15),transparent_25%),radial-gradient(circle_at_50%_80%,rgba(236,72,153,0.08),transparent_30%)]" />
+
+      <section className="relative z-10 grid w-full max-w-5xl grid-cols-1 gap-8 rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-lg md:grid-cols-2 md:p-10">
+        <div className="flex flex-col justify-between space-y-6">
+          <div className="space-y-3">
+            <p className="inline-flex w-fit items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100/80">Admin</p>
+            <h1 className="text-3xl font-bold text-white md:text-4xl">Control Panel Access</h1>
+            <p className="text-sm text-slate-100/80 md:text-base">
+              Sign in with your admin credentials to continue. Tokens are stored locally so you can hop straight into the panel next time.
+            </p>
+          </div>
+
+          <div className="hidden rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-slate-100/70 md:block">
+            <p className="font-semibold text-white">Need help?</p>
+            <p className="mt-1">Reach out to your workspace owner to reset your access or rotate keys.</p>
+          </div>
         </div>
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
-          <label className="block space-y-2">
-            <span className="text-sm text-zinc-200">Username</span>
-            <input
-              className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none ring-amber-400/60 transition focus:border-amber-400/60 focus:ring-2"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
-              required
-              autoComplete="username"
-            />
-          </label>
+        <form className="space-y-5 rounded-xl border border-white/10 bg-slate-900/50 p-6 shadow-xl" onSubmit={handleSubmit}>
+          <div className="flex items-center justify-between">
+            <p className="text-base font-semibold text-white">Sign in</p>
+            <span className="text-xs uppercase tracking-widest text-cyan-100/70">Secure</span>
+          </div>
 
-          <label className="block space-y-2">
-            <span className="text-sm text-zinc-200">Password</span>
-            <input
-              type="password"
-              className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none ring-amber-400/60 transition focus:border-amber-400/60 focus:ring-2"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
-              required
-              autoComplete="current-password"
-            />
-          </label>
+          <TextField label="Username" value={username} onChange={setUsername} />
+          <TextField label="Password" type="password" value={password} onChange={setPassword} />
 
-          {error ? (
-            <p className="text-sm font-medium text-amber-300">{error}</p>
-          ) : null}
+          {error && <p className="rounded-md border border-red-400/40 bg-red-500/10 px-3 py-2 text-sm text-red-100">{error}</p>}
 
           <button
+            className="relative flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:cursor-not-allowed disabled:from-slate-600 disabled:to-slate-700"
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center rounded-lg bg-amber-400 px-4 py-3 text-sm font-semibold text-black transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:bg-amber-200"
           >
-            {loading ? "Signing in..." : "Login"}
+            {loading ? 'Signing in…' : 'Enter Dashboard'}
           </button>
         </form>
-
-        <div className="mt-8 rounded-lg border border-white/5 bg-white/5 p-4 text-xs text-zinc-400">
-          <p>Demo credentials:</p>
-          <p className="mt-1 font-semibold text-white">admin / password123</p>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
