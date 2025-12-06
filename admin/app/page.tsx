@@ -1,9 +1,19 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const LOGIN_ENDPOINT = "http://127.0.0.1:5000/login";
+const getLoginEndpoint = () => {
+  // Use env-provided API base when available; otherwise default to same-origin path
+  const envBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (envBase) {
+    return `${envBase.replace(/\/$/, "")}/login`;
+  }
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}/login`;
+  }
+  return "/login";
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,6 +21,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const loginEndpoint = useMemo(() => getLoginEndpoint(), []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,7 +29,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const response = await fetch(LOGIN_ENDPOINT, {
+      const response = await fetch(loginEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
