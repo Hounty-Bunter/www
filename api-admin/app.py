@@ -142,6 +142,77 @@ def me(user_id=None, decoded_token=None, username=None):
   return jsonify({"status": 200, "user": row}), 200
 
 
+@app.route("/user/<int:user_id>", methods=["GET"])
+@require_auth
+def get_user(user_id=None, decoded_token=None, username=None):
+  try:
+    conn = get_db_conn()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT id, username, email, created_at, updated_at FROM users WHERE id = %s", (user_id,))
+    row = cur.fetchone()
+  except mysql.connector.Error as exc:
+    app.logger.error("DB error: %s", exc)
+    return jsonify({"msg": "Database error", "status": 500}), 500
+  finally:
+    try:
+      if cur:
+        cur.close()
+      if conn:
+        conn.close()
+    except Exception:
+      pass
+
+  if not row:
+    return jsonify({"msg": "User not found", "status": 404}), 404
+
+  return jsonify({"status": 200, "user": row}), 200
+
+
+@app.route("/user/<int:user_id>", methods=["PATCH"])
+@require_auth
+def update_user(user_id=None, decoded_token=None, username=None):
+  try:
+    conn = get_db_conn()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("UPDATE users SET username = %s, email = %s, created_at = %s, updated_at = %s WHERE id = %s", (username, email, created_at, updated_at, user_id))
+    conn.commit()
+  except mysql.connector.Error as exc:
+    app.logger.error("DB error: %s", exc)
+    return jsonify({"msg": "Database error", "status": 500}), 500
+  finally:
+    try:
+      if cur:
+        cur.close()
+      if conn:
+        conn.close()
+    except Exception:
+      pass
+
+  return jsonify({"status": 200, "message": "User updated"}), 200
+
+
+@app.route("/user/<int:user_id>", methods=["DELETE"])
+@require_auth
+def delete_user(user_id=None, decoded_token=None, username=None):
+  try:
+    conn = get_db_conn()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+    conn.commit()
+  except mysql.connector.Error as exc:
+    app.logger.error("DB error: %s", exc)
+    return jsonify({"msg": "Database error", "status": 500}), 500
+  finally:
+    try:
+      if cur:
+        cur.close()
+      if conn:
+        conn.close()
+    except Exception:
+      pass
+
+  return jsonify({"status": 200, "message": "User deleted"}), 200
+
 @app.route("/users", methods=["GET"])
 @require_auth
 def list_users(user_id=None, decoded_token=None, username=None):
