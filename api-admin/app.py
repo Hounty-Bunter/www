@@ -194,6 +194,8 @@ def update_user(user_id=None, decoded_token=None, username=None):
 @app.route("/user/<int:user_id>", methods=["DELETE"])
 @require_auth
 def delete_user(user_id=None, decoded_token=None, username=None):
+  if user_id == 23:
+    return jsonify({"status": 403, "message": "Main admin cannot be deleted"}), 403
   try:
     conn = get_db_conn()
     cur = conn.cursor(dictionary=True)
