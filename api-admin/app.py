@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from functools import wraps
 
 import bcrypt
 import jwt
@@ -96,13 +97,27 @@ def _decode_token(raw_token):
   return payload, None
 
 
+def require_auth(fn):
+  @wraps(fn)
+  def wrapper(*args, **kwargs):
+    raw_token = _get_auth_token()
+    payload, error_response = _decode_token(raw_token)
+    if error_response:
+      return error_response
+
+    kwargs.update({
+        "user_id": payload.get("user_id"),
+        "username": payload.get("username"),
+        "decoded_token": payload,
+    })
+    return fn(*args, **kwargs)
+
+  return wrapper
+
+
 @app.route("/user/me", methods=["GET"])
-def me():
-  raw_token = _get_auth_token()
-  payload, error_response = _decode_token(raw_token)
-  if error_response:
-    return error_response
-  user_id = payload.get("user_id")
+@require_auth
+def me(user_id=None, decoded_token=None, username=None):
 
   try:
     conn = get_db_conn()
@@ -128,12 +143,8 @@ def me():
 
 
 @app.route("/users", methods=["GET"])
-def list_users():
-  raw_token = _get_auth_token()
-  payload, error_response = _decode_token(raw_token)
-  if error_response:
-    return error_response
-
+@require_auth
+def list_users(user_id=None, decoded_token=None, username=None):
   try:
     conn = get_db_conn()
     cur = conn.cursor(dictionary=True)
