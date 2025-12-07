@@ -105,9 +105,10 @@ def require_auth(fn):
     if error_response:
       return error_response
 
+    # Avoid clobbering path parameters by namespacing auth-derived values
     kwargs.update({
-        "user_id": payload.get("user_id"),
-        "username": payload.get("username"),
+        "auth_user_id": payload.get("user_id"),
+        "auth_username": payload.get("username"),
         "decoded_token": payload,
     })
     return fn(*args, **kwargs)
@@ -117,12 +118,12 @@ def require_auth(fn):
 
 @app.route("/user/me", methods=["GET"])
 @require_auth
-def me(user_id=None, decoded_token=None, username=None):
+def me(auth_user_id=None, decoded_token=None, auth_username=None):
 
   try:
     conn = get_db_conn()
     cur = conn.cursor(dictionary=True)
-    cur.execute("SELECT id, username, email, created_at, updated_at FROM users WHERE id = %s", (user_id,))
+    cur.execute("SELECT id, username, email, created_at, updated_at FROM users WHERE id = %s", (auth_user_id,))
     row = cur.fetchone()
   except mysql.connector.Error as exc:
     app.logger.error("DB error: %s", exc)
@@ -144,7 +145,7 @@ def me(user_id=None, decoded_token=None, username=None):
 
 @app.route("/user/<int:user_id>", methods=["GET"])
 @require_auth
-def get_user(user_id=None, decoded_token=None, username=None):
+def get_user(user_id=None, auth_user_id=None, decoded_token=None, auth_username=None):
   try:
     conn = get_db_conn()
     cur = conn.cursor(dictionary=True)
@@ -170,7 +171,7 @@ def get_user(user_id=None, decoded_token=None, username=None):
 
 @app.route("/user/<int:user_id>", methods=["PATCH"])
 @require_auth
-def update_user(user_id=None, decoded_token=None, username=None):
+def update_user(user_id=None, auth_user_id=None, decoded_token=None, auth_username=None):
   payload = request.get_json(force=True, silent=True) or {}
   new_username = payload.get("username")
   email = payload.get("email")
@@ -205,7 +206,7 @@ def update_user(user_id=None, decoded_token=None, username=None):
 
 @app.route("/user/<int:user_id>", methods=["DELETE"])
 @require_auth
-def delete_user(user_id=None, decoded_token=None, username=None):
+def delete_user(user_id=None, auth_user_id=None, decoded_token=None, auth_username=None):
   if user_id == 23:
     return jsonify({"status": 403, "message": "Main admin cannot be deleted"}), 403
   try:
