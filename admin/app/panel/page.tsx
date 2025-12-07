@@ -26,7 +26,7 @@ export default function PanelPage() {
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) {
-      router.push('/login');
+      router.push('/');
       return;
     }
 
@@ -44,7 +44,7 @@ export default function PanelPage() {
           const data = (await res.json()) as MeResponse;
           setUser(data.user ?? null);
         } else if (res.status === 401) {
-          router.push('/login');
+          router.push('/');
           return;
         } else {
           const data = (await res.json().catch(() => null)) as MeResponse | null;
