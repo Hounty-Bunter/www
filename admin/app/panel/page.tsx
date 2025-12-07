@@ -22,7 +22,7 @@ export default function PanelPage() {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:5000';
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ?? '';
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -32,8 +32,13 @@ export default function PanelPage() {
     }
 
     const fetchUser = async () => {
+      const base = apiBase || (typeof window !== 'undefined' ? '' : '');
+      const url = base
+        ? `${base.replace(/\/$/, '')}/user/me`
+        : '/user/me';
+
       try {
-        const res = await fetch(`${apiBase}/user/me`, {
+        const res = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
           cache: 'no-store',
         });
