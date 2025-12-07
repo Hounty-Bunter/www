@@ -78,22 +78,31 @@ def _get_auth_token() -> str | None:
   return None
 
 
-@app.route("/user/me", methods=["GET"])
-def me():
-  raw_token = _get_auth_token()
+def _decode_token(raw_token):
   if not raw_token:
-    return jsonify({"msg": "Missing token", "status": 401}), 401
+    return None, (jsonify({"msg": "Missing token", "status": 401}), 401)
 
   try:
     payload = jwt.decode(raw_token, JWT_SECRET, algorithms=[JWT_ALG])
     user_id = payload.get("user_id")
   except jwt.ExpiredSignatureError:
-    return jsonify({"msg": "Token expired", "status": 401}), 401
+    return None, (jsonify({"msg": "Token expired", "status": 401}), 401)
   except jwt.InvalidTokenError:
-    return jsonify({"msg": "Invalid token", "status": 401}), 401
+    return None, (jsonify({"msg": "Invalid token", "status": 401}), 401)
 
   if not user_id:
-    return jsonify({"msg": "Invalid token payload", "status": 401}), 401
+    return None, (jsonify({"msg": "Invalid token payload", "status": 401}), 401)
+
+  return payload, None
+
+
+@app.route("/user/me", methods=["GET"])
+def me():
+  raw_token = _get_auth_token()
+  payload, error_response = _decode_token(raw_token)
+  if error_response:
+    return error_response
+  user_id = payload.get("user_id")
 
   try:
     conn = get_db_conn()
@@ -116,6 +125,33 @@ def me():
     return jsonify({"msg": "User not found", "status": 404}), 404
 
   return jsonify({"status": 200, "user": row}), 200
+
+
+@app.route("/users", methods=["GET"])
+def list_users():
+  raw_token = _get_auth_token()
+  payload, error_response = _decode_token(raw_token)
+  if error_response:
+    return error_response
+
+  try:
+    conn = get_db_conn()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT id, username, email, name, created_at, updated_at, is_admin FROM users")
+    users = cur.fetchall() or []
+  except mysql.connector.Error as exc:
+    app.logger.error("DB error: %s", exc)
+    return jsonify({"msg": "Database error", "status": 500}), 500
+  finally:
+    try:
+      if cur:
+        cur.close()
+      if conn:
+        conn.close()
+    except Exception:
+      pass
+
+  return jsonify({"status": 200, "users": users}), 200
 
 
 if __name__ == "__main__":
