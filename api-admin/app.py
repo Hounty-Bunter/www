@@ -14,6 +14,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD", "thebat1939")
 DB_NAME = os.getenv("DB_NAME", "myapp")
 JWT_SECRET = os.getenv("JWT_SECRET", "change-me")
 JWT_EXP_HOURS = int(os.getenv("JWT_EXP_HOURS", "1"))
+JWT_ALG = "HS256"
 
 
 def get_db_conn():
@@ -65,9 +66,56 @@ def login():
     return jsonify({"msg": "Invalid credentials", "status": 401}), 401
 
   exp = datetime.utcnow() + timedelta(hours=JWT_EXP_HOURS)
-  token = jwt.encode({"user_id": row["id"], "username": row["username"], "exp": exp}, JWT_SECRET, algorithm="HS256")
+  token = jwt.encode({"user_id": row["id"], "username": row["username"], "exp": exp}, JWT_SECRET, algorithm=JWT_ALG)
 
   return jsonify({"msg": "ok", "status": 200, "token": token}), 200
+
+
+def _get_auth_token() -> str | None:
+  auth_header = request.headers.get("Authorization", "")
+  if auth_header.lower().startswith("bearer "):
+    return auth_header.split(" ", 1)[1].strip() or None
+  return None
+
+
+@app.route("/user/me", methods=["GET"])
+def me():
+  raw_token = _get_auth_token()
+  if not raw_token:
+    return jsonify({"msg": "Missing token", "status": 401}), 401
+
+  try:
+    payload = jwt.decode(raw_token, JWT_SECRET, algorithms=[JWT_ALG])
+    user_id = payload.get("user_id")
+  except jwt.ExpiredSignatureError:
+    return jsonify({"msg": "Token expired", "status": 401}), 401
+  except jwt.InvalidTokenError:
+    return jsonify({"msg": "Invalid token", "status": 401}), 401
+
+  if not user_id:
+    return jsonify({"msg": "Invalid token payload", "status": 401}), 401
+
+  try:
+    conn = get_db_conn()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT id, username, email, created_at, updated_at FROM users WHERE id = %s", (user_id,))
+    row = cur.fetchone()
+  except mysql.connector.Error as exc:
+    app.logger.error("DB error: %s", exc)
+    return jsonify({"msg": "Database error", "status": 500}), 500
+  finally:
+    try:
+      if cur:
+        cur.close()
+      if conn:
+        conn.close()
+    except Exception:
+      pass
+
+  if not row:
+    return jsonify({"msg": "User not found", "status": 404}), 404
+
+  return jsonify({"status": 200, "user": row}), 200
 
 
 if __name__ == "__main__":
