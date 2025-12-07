@@ -29,7 +29,6 @@ export default function PanelPage() {
       router.push('/');
       return;
     }
-
     const fetchUser = async () => {
       // Mirror login page behavior: hit the API via the same /api prefix
       const url = '/api/user/me';
