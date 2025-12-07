@@ -22,7 +22,6 @@ export default function PanelPage() {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ?? '';
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -32,10 +31,8 @@ export default function PanelPage() {
     }
 
     const fetchUser = async () => {
-      const base = apiBase || (typeof window !== 'undefined' ? '' : '');
-      const url = base
-        ? `${base.replace(/\/$/, '')}/user/me`
-        : '/user/me';
+      // Mirror login page behavior: hit the API via the same /api prefix
+      const url = '/api/user/me';
 
       try {
         const res = await fetch(url, {
@@ -61,7 +58,7 @@ export default function PanelPage() {
     };
 
     fetchUser();
-  }, [router, apiBase]);
+  }, [router]);
 
   const formatDate = (value?: string) => {
     if (!value) return '—';
