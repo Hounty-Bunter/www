@@ -36,8 +36,9 @@ export default function UsersPage() {
         });
 
         if (res.status === 200) {
-          const data = (await res.json()) as User[];
-          setUsers(data);
+          const data = (await res.json()) as User[] | { users?: User[] };
+          const list = Array.isArray(data) ? data : data?.users;
+          setUsers(list || []);
         } else if (res.status === 401) {
           router.push('/');
           return;
