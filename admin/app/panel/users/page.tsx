@@ -20,7 +20,6 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [rawResponse, setRawResponse] = useState('');
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -40,18 +39,15 @@ export default function UsersPage() {
           const data = (await res.json()) as { status?: number; users?: User[] } | User[];
           const list = Array.isArray(data) ? data : data?.users;
           setUsers(list || []);
-          setRawResponse(JSON.stringify(data, null, 2));
         } else if (res.status === 401) {
           router.push('/');
           return;
         } else {
           const data = (await res.json().catch(() => null)) as { msg?: string } | null;
           setError(data?.msg || `Failed to load users (status ${res.status})`);
-          setRawResponse(data ? JSON.stringify(data, null, 2) : '');
         }
       } catch (err) {
         setError('Connection error');
-        setRawResponse('');
       } finally {
         setLoading(false);
       }
@@ -134,18 +130,6 @@ export default function UsersPage() {
                 ))}
               </tbody>
             </table>
-          </div>
-        )}
-
-        {!loading && rawResponse && (
-          <div className="mt-6 rounded-xl border border-amber-500/30 bg-black/60 p-4 text-xs text-amber-100/90">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="font-semibold text-amber-200">Raw response</p>
-              <span className="rounded-full bg-amber-500/15 px-3 py-1 text-[11px] uppercase tracking-[0.12em] text-amber-200/90">
-                /api/users
-              </span>
-            </div>
-            <pre className="whitespace-pre-wrap break-words">{rawResponse}</pre>
           </div>
         )}
       </div>

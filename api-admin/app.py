@@ -230,7 +230,7 @@ def delete_user(user_id=None, auth_user_id=None, decoded_token=None, auth_userna
 
 @app.route("/users", methods=["GET"])
 @require_auth
-def list_users(user_id=None, decoded_token=None, username=None):
+def list_users(user_id=None, auth_user_id=None, decoded_token=None, auth_username=None):
   try:
     conn = get_db_conn()
     cur = conn.cursor(dictionary=True)
