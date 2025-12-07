@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 type User = {
@@ -76,6 +77,27 @@ export default function PanelPage() {
           <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-200">
             {loading ? 'Loading' : user ? 'Authenticated' : 'Guest'}
           </span>
+        </div>
+
+        <div className="mb-8 flex flex-wrap gap-3">
+          <Link
+            href="/panel/users"
+            className="rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-400/20"
+          >
+            Users
+          </Link>
+          <Link
+            href="/panel/server-status"
+            className="rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-400/20"
+          >
+            Server status
+          </Link>
+          <Link
+            href="/panel/statistics"
+            className="rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-400/20"
+          >
+            Statistics
+          </Link>
         </div>
 
         {loading && (
