@@ -22,6 +22,7 @@ export default function PanelPage() {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:5000';
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -32,8 +33,9 @@ export default function PanelPage() {
 
     const fetchUser = async () => {
       try {
-        const res = await fetch('/user/me', {
+        const res = await fetch(`${apiBase}/user/me`, {
           headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store',
         });
 
         if (res.status === 200) {
@@ -44,7 +46,7 @@ export default function PanelPage() {
           return;
         } else {
           const data = (await res.json().catch(() => null)) as MeResponse | null;
-          setError(data?.msg || 'Failed to load profile');
+          setError(data?.msg || `Failed to load profile (status ${res.status})`);
         }
       } catch (err) {
         setError('Connection error');
@@ -54,7 +56,7 @@ export default function PanelPage() {
     };
 
     fetchUser();
-  }, [router]);
+  }, [router, apiBase]);
 
   const formatDate = (value?: string) => {
     if (!value) return '—';
