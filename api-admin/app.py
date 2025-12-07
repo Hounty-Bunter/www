@@ -171,10 +171,22 @@ def get_user(user_id=None, decoded_token=None, username=None):
 @app.route("/user/<int:user_id>", methods=["PATCH"])
 @require_auth
 def update_user(user_id=None, decoded_token=None, username=None):
+  payload = request.get_json(force=True, silent=True) or {}
+  new_username = payload.get("username")
+  email = payload.get("email")
+  created_at = payload.get("created_at")
+  updated_at = payload.get("updated_at")
+
+  if not all([new_username, email, created_at]):
+    return jsonify({"msg": "username, email, and created_at are required", "status": 400}), 400
+
   try:
     conn = get_db_conn()
     cur = conn.cursor(dictionary=True)
-    cur.execute("UPDATE users SET username = %s, email = %s, created_at = %s, updated_at = %s WHERE id = %s", (username, email, created_at, updated_at, user_id))
+    cur.execute(
+        "UPDATE users SET username = %s, email = %s, created_at = %s, updated_at = %s WHERE id = %s",
+        (new_username, email, created_at, updated_at, user_id),
+    )
     conn.commit()
   except mysql.connector.Error as exc:
     app.logger.error("DB error: %s", exc)
