@@ -137,7 +137,8 @@ def list_users():
   try:
     conn = get_db_conn()
     cur = conn.cursor(dictionary=True)
-    cur.execute("SELECT id, username, email, name, created_at, updated_at, is_admin FROM users")
+    # Return all users; alias username as name if a dedicated name column is absent
+    cur.execute("SELECT id, username, email, username AS name, created_at, updated_at, is_admin FROM users")
     users = cur.fetchall() or []
   except mysql.connector.Error as exc:
     app.logger.error("DB error: %s", exc)
