@@ -20,6 +20,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [rawResponse, setRawResponse] = useState('');
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -36,18 +37,21 @@ export default function UsersPage() {
         });
 
         if (res.status === 200) {
-          const data = (await res.json()) as User[] | { users?: User[] };
+          const data = (await res.json()) as { status?: number; users?: User[] } | User[];
           const list = Array.isArray(data) ? data : data?.users;
           setUsers(list || []);
+          setRawResponse(JSON.stringify(data, null, 2));
         } else if (res.status === 401) {
           router.push('/');
           return;
         } else {
           const data = (await res.json().catch(() => null)) as { msg?: string } | null;
           setError(data?.msg || `Failed to load users (status ${res.status})`);
+          setRawResponse(data ? JSON.stringify(data, null, 2) : '');
         }
       } catch (err) {
         setError('Connection error');
+        setRawResponse('');
       } finally {
         setLoading(false);
       }
@@ -90,12 +94,13 @@ export default function UsersPage() {
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Admin</th>
                   <th className="px-4 py-3">Created</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-amber-500/20 text-amber-50/90">
                 {users.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-4 text-center text-amber-100/70">
+                    <td colSpan={6} className="px-4 py-4 text-center text-amber-100/70">
                       No users found.
                     </td>
                   </tr>
@@ -107,10 +112,40 @@ export default function UsersPage() {
                     <td className="px-4 py-3">{u.email}</td>
                     <td className="px-4 py-3">{u.is_admin ? 'Yes' : 'No'}</td>
                     <td className="px-4 py-3">{new Date(u.created_at).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => console.log('edit', u.id)}
+                          className="rounded-full border border-amber-400/40 px-3 py-1 text-xs font-semibold text-amber-100 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-400/20"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => console.log('delete', u.id)}
+                          className="rounded-full border border-red-400/40 px-3 py-1 text-xs font-semibold text-red-100 transition hover:-translate-y-0.5 hover:border-red-300 hover:bg-red-500/20"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {!loading && rawResponse && (
+          <div className="mt-6 rounded-xl border border-amber-500/30 bg-black/60 p-4 text-xs text-amber-100/90">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="font-semibold text-amber-200">Raw response</p>
+              <span className="rounded-full bg-amber-500/15 px-3 py-1 text-[11px] uppercase tracking-[0.12em] text-amber-200/90">
+                /api/users
+              </span>
+            </div>
+            <pre className="whitespace-pre-wrap break-words">{rawResponse}</pre>
           </div>
         )}
       </div>
