@@ -12,7 +12,8 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 
   // Prefer an explicit API_BASE_URL, otherwise use the current origin (works when Flask shares the host).
   const upstreamBase = process.env.API_BASE_URL ?? req.nextUrl.origin;
-  const backendUrl = `${upstreamBase}/user/${userId}`;
+  // Backend serves user detail at /api/user/<id> (per Flask route).
+  const backendUrl = `${upstreamBase}/api/user/${userId}`;
 
   try {
     const res = await fetch(backendUrl, {
