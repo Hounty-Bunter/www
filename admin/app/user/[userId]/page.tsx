@@ -100,14 +100,17 @@ export default function UserDetail() {
       const data = (await res.json().catch(() => null)) as { user?: User; msg?: string; status?: number } | null;
       if (res.status === 200) {
         const updated = (data?.user as User | undefined) ?? null;
-        setUser(updated);
         if (updated) {
+          setUser(updated);
           setForm({
             username: updated.username ?? '',
             email: updated.email ?? '',
             is_admin: !!updated.is_admin,
           });
         }
+        // After a successful update, go back to the users list
+        router.push('/panel/users');
+        return;
       } else if (res.status === 401) {
         router.push('/');
         return;
