@@ -104,7 +104,14 @@ export default function UsersPage() {
                 {users.map((u) => (
                   <tr key={u.id} className="hover:bg-amber-500/5">
                     <td className="px-4 py-3">{u.id}</td>
-                    <td className="px-4 py-3">{u.username}</td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/user/${u.id}`}
+                        className="text-amber-200 underline decoration-amber-400/50 underline-offset-4 hover:text-amber-100"
+                      >
+                        {u.username}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">{u.email}</td>
                     <td className="px-4 py-3">{u.is_admin ? 'Yes' : 'No'}</td>
                     <td className="px-4 py-3">{new Date(u.created_at).toLocaleString()}</td>
