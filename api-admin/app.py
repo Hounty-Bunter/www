@@ -173,20 +173,41 @@ def get_user(user_id=None, auth_user_id=None, decoded_token=None, auth_username=
 @require_auth
 def update_user(user_id=None, auth_user_id=None, decoded_token=None, auth_username=None):
   payload = request.get_json(force=True, silent=True) or {}
-  new_username = payload.get("username")
-  email = payload.get("email")
-  created_at = payload.get("created_at")
-  updated_at = payload.get("updated_at")
-
-  if not all([new_username, email, created_at]):
-    return jsonify({"msg": "username, email, and created_at are required", "status": 400}), 400
-
   try:
     conn = get_db_conn()
     cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT username, email, is_admin FROM users WHERE id = %s", (user_id,))
+    existing = cur.fetchone()
+    if not existing:
+      return jsonify({"msg": "User not found", "status": 404}), 404
+
+    provided_username = payload.get("username")
+    provided_email = payload.get("email")
+    raw_is_admin = payload.get("is_admin")
+
+    new_username = existing["username"] if provided_username is None else provided_username
+    email = existing["email"] if provided_email is None else provided_email
+
+    # Must provide at least one field to change
+    if provided_username is None and provided_email is None and raw_is_admin is None:
+      return jsonify({"msg": "username, email, or is_admin is required", "status": 400}), 400
+
+    # Normalize is_admin if provided
+    if raw_is_admin is None:
+      is_admin = existing.get("is_admin")
+    elif isinstance(raw_is_admin, bool):
+      is_admin = raw_is_admin
+    elif raw_is_admin in (0, 1):
+      is_admin = bool(raw_is_admin)
+    elif isinstance(raw_is_admin, str) and raw_is_admin.lower() in ("true", "false"):
+      is_admin = raw_is_admin.lower() == "true"
+    else:
+      return jsonify({"msg": "is_admin must be a boolean", "status": 400}), 400
+
+    updated_at = datetime.utcnow()
     cur.execute(
-        "UPDATE users SET username = %s, email = %s, created_at = %s, updated_at = %s WHERE id = %s",
-        (new_username, email, created_at, updated_at, user_id),
+        "UPDATE users SET username = %s, email = %s, is_admin = %s, updated_at = %s WHERE id = %s",
+        (new_username, email, is_admin, updated_at, user_id),
     )
     conn.commit()
   except mysql.connector.Error as exc:

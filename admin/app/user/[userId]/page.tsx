@@ -8,7 +8,6 @@ type User = {
   id: number;
   username: string;
   email: string;
-  name?: string;
   is_admin?: number;
   created_at: string;
   updated_at: string;
@@ -22,10 +21,9 @@ export default function UserDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState<{ username: string; email: string; name: string; is_admin: boolean }>({
+  const [form, setForm] = useState<{ username: string; email: string; is_admin: boolean }>({
     username: '',
     email: '',
-    name: '',
     is_admin: false,
   });
 
@@ -51,7 +49,6 @@ export default function UserDetail() {
             setForm({
               username: incoming.username ?? '',
               email: incoming.email ?? '',
-              name: incoming.name ?? '',
               is_admin: !!incoming.is_admin,
             });
           }
@@ -97,7 +94,6 @@ export default function UserDetail() {
         body: JSON.stringify({
           username: form.username,
           email: form.email,
-          name: form.name,
           is_admin: form.is_admin ? 1 : 0,
         }),
       });
@@ -109,7 +105,6 @@ export default function UserDetail() {
           setForm({
             username: updated.username ?? '',
             email: updated.email ?? '',
-            name: updated.name ?? '',
             is_admin: !!updated.is_admin,
           });
         }
@@ -175,15 +170,6 @@ export default function UserDetail() {
                   value={form.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                   placeholder="Email"
-                />
-              </label>
-              <label className="block space-y-2">
-                <span className="text-xs uppercase tracking-[0.18em] text-amber-300">Name</span>
-                <input
-                  className="w-full rounded-lg border border-amber-400/30 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-300 focus:ring-2 focus:ring-amber-300/40"
-                  value={form.name}
-                  onChange={(e) => handleChange('name', e.target.value)}
-                  placeholder="Name"
                 />
               </label>
               <label className="flex items-center gap-3 rounded-lg border border-amber-400/30 bg-black/40 px-3 py-2 text-sm text-white">
