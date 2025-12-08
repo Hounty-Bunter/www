@@ -17,8 +17,8 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 
   // Prefer explicit API_BASE_URL; otherwise use current origin.
   const upstreamBase = process.env.API_BASE_URL ?? req.nextUrl.origin;
-  // Backend serves user detail at /user/<id>.
-  const backendUrl = `${upstreamBase}/user/${userId}`;
+  // Backend serves user detail at /api/user/<id>.
+  const backendUrl = `${upstreamBase}/api/user/${userId}`;
 
   try {
     const res = await fetch(backendUrl, {
