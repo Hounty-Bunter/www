@@ -13,10 +13,20 @@ function requireAuth(req: NextRequest) {
 
 async function proxy(req: NextRequest, userId: string, init: RequestInit) {
   const base = getBaseUrl(req);
-  const backendUrl = `${base}/user/${userId}`;
-  const res = await fetch(backendUrl, { ...init, cache: 'no-store' });
-  const data = await res.json().catch(() => null);
-  return NextResponse.json(data ?? { status: res.status }, { status: res.status });
+  const candidates = [
+    `${base}/api/user/${userId}`, // preferred if backend exposes /api/user/:id
+    `${base}/user/${userId}`,     // fallback to plain /user/:id
+  ];
+
+  for (const backendUrl of candidates) {
+    const res = await fetch(backendUrl, { ...init, cache: 'no-store' });
+    const data = await res.json().catch(() => null);
+    if (res.status === 404) continue;
+    return NextResponse.json(data ?? { status: res.status }, { status: res.status });
+  }
+
+  // If every candidate returned 404
+  return NextResponse.json({ msg: 'User not found', status: 404 }, { status: 404 });
 }
 
 export async function GET(req: NextRequest, { params }: { params: { userId: string } }) {
