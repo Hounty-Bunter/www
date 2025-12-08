@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 type User = {
   id: number;
@@ -13,8 +13,10 @@ type User = {
   updated_at: string;
 };
 
-export default function UserDetail({ params }: { params: { userId: string } }) {
+export default function UserDetail() {
   const router = useRouter();
+  const params = useParams<{ userId?: string }>();
+  const userId = params?.userId ? String(params.userId) : '';
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -49,9 +51,8 @@ export default function UserDetail({ params }: { params: { userId: string } }) {
         setLoading(false);
       }
     };
-
-    fetchUser();
-  }, [params.userId, router]);
+    if (userId) fetchUser();
+  }, [router, userId]);
 
   const formatDate = (value?: string) => {
     if (!value) return '—';
@@ -65,7 +66,7 @@ export default function UserDetail({ params }: { params: { userId: string } }) {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-amber-400">Profile</p>
-            <h1 className="mt-1 text-3xl font-bold text-white">User #{params.userId}</h1>
+            <h1 className="mt-1 text-3xl font-bold text-white">User #{userId || '?'}</h1>
           </div>
           <Link
             href="/panel/users"
