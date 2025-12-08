@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 // Proxy GET /api/user/:id to the Flask backend /user/<id>
 export async function GET(req: NextRequest, { params }: { params: { userId: string } }) {
   // Authorization header is required to match the backend behavior.
-  const authHeader = req.headers.get('Authorization');
+  const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
   const userId = params.userId;
 
   if (!authHeader) {
