@@ -10,8 +10,9 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
     return NextResponse.json({ msg: 'Missing user id', status: 400 }, { status: 400 });
   }
 
-  // Hit the existing Flask endpoint. Adjust host/port if different in your env.
-  const backendUrl = `${process.env.API_BASE_URL ?? 'http://localhost:5000'}/user/${userId}`;
+  // Prefer an explicit API_BASE_URL, otherwise use the current origin (works when Flask shares the host).
+  const upstreamBase = process.env.API_BASE_URL ?? req.nextUrl.origin;
+  const backendUrl = `${upstreamBase}/user/${userId}`;
 
   try {
     const res = await fetch(backendUrl, {
