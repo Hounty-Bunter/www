@@ -17,19 +17,31 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 
   // Prefer explicit API_BASE_URL; otherwise use current origin.
   const upstreamBase = process.env.API_BASE_URL ?? req.nextUrl.origin;
-  // Backend serves user detail at /api/user/<id>.
-  const backendUrl = `${upstreamBase}/api/user/${userId}`;
 
-  try {
-    const res = await fetch(backendUrl, {
-      method: 'GET',
-      headers: { Authorization: authHeader },
-      cache: 'no-store',
-    });
+  // Try /user/<id> first (matches Flask route). Fallback to /api/user/<id> if 404.
+  const endpoints = [
+    `${upstreamBase}/user/${userId}`,
+    `${upstreamBase}/api/user/${userId}`,
+  ];
 
-    const data = await res.json().catch(() => null);
-    return NextResponse.json(data ?? { msg: 'Upstream error', status: res.status }, { status: res.status });
-  } catch (err) {
-    return NextResponse.json({ msg: 'Proxy error', detail: `${err}` }, { status: 500 });
+  for (const backendUrl of endpoints) {
+    try {
+      const res = await fetch(backendUrl, {
+        method: 'GET',
+        headers: { Authorization: authHeader },
+        cache: 'no-store',
+      });
+
+      const data = await res.json().catch(() => null);
+      // If not found, try next endpoint; otherwise return response.
+      if (res.status === 404) continue;
+      return NextResponse.json(data ?? { msg: 'Upstream error', status: res.status }, { status: res.status });
+    } catch (err) {
+      // On network error, try next endpoint.
+      continue;
+    }
   }
+
+  // If both attempts failed/404.
+  return NextResponse.json({ msg: 'User not found', status: 404 }, { status: 404 });
 }
