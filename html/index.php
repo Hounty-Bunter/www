@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tweet_content'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hounty Bunter - Home</title>
-    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css?v=2">
+    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css?v=3">
 
 </head>
 <body>
