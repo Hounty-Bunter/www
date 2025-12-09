@@ -54,7 +54,7 @@ $bodyClass = $isSuccess ? 'success-page' : '';
       font-weight:800;
       color:#fff;
     }
-    .message-status.success{ background:#16a34a; }
+    .message-status.success{ background:#f6b700; color:#0a0a0a; }
     .message-status.error{ background:#dc2626; }
 
     .message-container h1{

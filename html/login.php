@@ -153,7 +153,7 @@ if (isset($_POST['submit'])) {
     <div class="login-container">
         <div class="logo">
             <h1><span class="brand-main">Hounty</span><span class="brand-tag">Bunter</span></h1>
-            <p>Welcome back! Please sign in</p>
+            
         </div>
     <?php if ($login_status === 0 && !empty($msg)) { echo '<div class="form-message error">'.htmlspecialchars($msg).'</div>'; } ?>
 

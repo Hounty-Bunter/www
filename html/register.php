@@ -84,30 +84,14 @@ if (isset($_POST['submit'])) {
 
         // Check if the insert was successful
         if ($stmt->affected_rows > 0) {
-            // Show success message with beautiful styling
-            echo "<div class='alert alert-success' style='text-align: center; padding: 20px; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);'>";
-            echo "<div style='font-size: 3em; margin-bottom: 15px;'>✓</div>";
-            echo "<h2 style='color: #155724; margin-bottom: 10px; font-size: 1.8em; font-weight: 600;'>Registration Successful!</h2>";
-            echo "<p style='color: #155724; font-size: 1.2em; margin-bottom: 15px;'>Welcome, <strong>" . htmlspecialchars($username) . "</strong>!</p>";
-            echo "<div style='display: flex; justify-content: center; align-items: center; margin: 20px 0;'>";
-            echo "<div class='spinner-redirect'></div>";
-            echo "</div>";
-            echo "<p style='color: #0c5460; font-size: 1.1em; font-weight: 500;'>Redirecting to login page<span class='dots-redirect'><span></span><span></span><span></span></span></p>";
-            echo "</div>";
-            
-
-            // JavaScript redirection after successful registration
+            echo "<div style='text-align:center; color:#f6b700; font-weight:700; margin:16px 0;'>✓ Account created. Redirecting to login page…</div>";
             echo "<script>
                 setTimeout(function(){
                     window.location.href = 'login.php';
-                }, 3000);
+                }, 1500);
             </script>";
         } else {
-            echo "<div class='alert alert-error' style='text-align: center; padding: 20px; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);'>";
-            echo "<div style='font-size: 3em; margin-bottom: 15px;'>✗</div>";
-            echo "<h2 style='color: #721c24; margin-bottom: 10px; font-size: 1.8em; font-weight: 600;'>Registration Failed</h2>";
-            echo "<p style='color: #721c24; font-size: 1.1em;'>Failed to register user. Please try again later.</p>";
-            echo "</div>";
+            echo "<div style='text-align:center; color:#f87171; font-weight:700; margin:16px 0;'>✗ Registration failed. Please try again later.</div>";
         }
         $stmt->close();
     } else {
@@ -126,12 +110,35 @@ if (isset($_POST['submit'])) {
 <html>
 <head>
     <title>Register - Hounty Bunter</title>
-    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css">
+    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css?v=3">
+    <style>
+        .register-container {
+            background: #0f0f0f;
+            border: 1px solid #1f1f1f;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+        }
+        .logo h1 {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .logo .brand-main {
+            color: #f7f7f7;
+        }
+        .logo .brand-tag {
+            background: #f6b700;
+            color: #0a0a0a;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+        }
+    </style>
 </head>
 <body>
     <div class="register-container">
         <div class="logo">
-            <h1>Hounty Bunter</h1>
+            <h1><span class="brand-main">Hounty</span><span class="brand-tag">Bunter</span></h1>
             <p>Create your account</p>
         </div>
 
