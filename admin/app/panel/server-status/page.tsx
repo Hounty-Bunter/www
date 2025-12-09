@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Script from 'next/script';
+import { useRouter } from 'next/navigation';
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 declare global {
@@ -18,6 +19,7 @@ const SOCKET_PATH = '/socket.io';
 const SOCKET_NAMESPACE = '/ws';
 
 export default function ServerStatusPage() {
+  const router = useRouter();
   const [command, setCommand] = useState('');
   const [connected, setConnected] = useState(false);
   const [scriptReady, setScriptReady] = useState(false);
@@ -34,8 +36,16 @@ export default function ServerStatusPage() {
   useEffect(() => {
     if (!scriptReady || typeof window === 'undefined' || !window.io) return;
 
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      appendLog('Missing auth token. Redirecting to login.', 'error');
+      setConnected(false);
+      router.push('/');
+      return;
+    }
+
     const base = (process.env.NEXT_PUBLIC_SOCKET_ENDPOINT || window.location.origin || '').replace(/\/+$/, '');
-    const socketUrl = `${base}${SOCKET_NAMESPACE}`;
+    const socketUrl = `${base}${SOCKET_NAMESPACE}?token=${encodeURIComponent(token)}`;
     const socket = window.io(socketUrl, {
       path: SOCKET_PATH,
       transports: ['websocket'],
@@ -71,7 +81,7 @@ export default function ServerStatusPage() {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [appendLog, scriptReady]);
+  }, [appendLog, router, scriptReady]);
 
   const sendCommand = useCallback(
     (cmd: string) => {
