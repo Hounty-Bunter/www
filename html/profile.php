@@ -70,7 +70,7 @@ $tweets_stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($user_info['username']); ?>'s Profile</title>
-    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css">
+    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css?v=3">
 </head>
 <body class="profile-page">
 

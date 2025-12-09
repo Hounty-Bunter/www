@@ -902,12 +902,12 @@ body {
   /* -------------------------------------------------
      Public Profile Card Styling
      ------------------------------------------------- */
-  body.profile-page {
+body.profile-page {
     min-height: 100vh;
     margin: 0;
     padding: 48px 16px;
     background: radial-gradient(circle at 10% 20%, rgba(255, 197, 91, 0.12), transparent 45%),
-      radial-gradient(circle at 90% 10%, rgba(255, 84, 52, 0.18), transparent 55%),
+      radial-gradient(circle at 90% 10%, rgba(246, 183, 0, 0.22), transparent 55%),
       #05070f;
     display: flex;
     align-items: center;
