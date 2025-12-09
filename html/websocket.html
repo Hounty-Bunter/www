@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title>WebSocket</title>
+  </head>
+  <body>
+    <h1>WebSocket</h1>
+  </body>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script>
+    const socket = io('https://admin.voorivex.ir', {
+      path: '/socket.io',
+      transports: ['websocket'], // force ws if you want
+    });
+
+    socket.on('connect', () => {
+      console.log('connected', socket.id);
+    });
+
+    socket.on('response', (data) => {
+      console.log('response', data);
+    });
+  </script>
+</html>
