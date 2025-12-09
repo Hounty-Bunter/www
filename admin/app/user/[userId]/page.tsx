@@ -21,6 +21,7 @@ export default function UserDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState<{ username: string; email: string; is_admin: boolean }>({
     username: '',
     email: '',
@@ -124,6 +125,45 @@ export default function UserDetail() {
     }
   };
 
+  const handleDelete = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      router.push('/');
+      return;
+    }
+    if (!userId) {
+      setError('Invalid user id');
+      return;
+    }
+    const confirmed = typeof window !== 'undefined' ? window.confirm('Are you sure you want to delete this user?') : false;
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError('');
+    try {
+      const res = await fetch(`/api/user/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = (await res.json().catch(() => null)) as { msg?: string; status?: number } | null;
+      if (res.status === 200) {
+        router.push('/panel/users');
+        return;
+      } else if (res.status === 401) {
+        router.push('/');
+        return;
+      } else {
+        setError(data?.msg || `Failed to delete user (status ${res.status})`);
+      }
+    } catch (err) {
+      setError('Connection error');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const formatDate = (value?: string) => {
     if (!value) return '—';
     const date = new Date(value);
@@ -198,14 +238,24 @@ export default function UserDetail() {
             </div>
 
             <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={handleUpdate}
-                disabled={saving}
-                className="rounded-full border border-amber-400/40 bg-amber-500/20 px-5 py-2 text-sm font-semibold text-amber-50 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-400/30 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {saving ? 'Updating…' : 'Update user'}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleUpdate}
+                  disabled={saving || deleting}
+                  className="rounded-full border border-amber-400/40 bg-amber-500/20 px-5 py-2 text-sm font-semibold text-amber-50 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-400/30 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {saving ? 'Updating…' : 'Update user'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={saving || deleting}
+                  className="rounded-full border border-red-400/40 bg-red-500/20 px-5 py-2 text-sm font-semibold text-red-100 transition hover:-translate-y-0.5 hover:border-red-300 hover:bg-red-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {deleting ? 'Deleting…' : 'Delete user'}
+                </button>
+              </div>
             </div>
           </div>
         )}

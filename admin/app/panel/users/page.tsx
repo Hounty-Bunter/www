@@ -20,6 +20,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -55,6 +56,39 @@ export default function UsersPage() {
 
     fetchUsers();
   }, [router]);
+
+  const handleDelete = async (userId: number) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      router.push('/');
+      return;
+    }
+
+    const confirmed = typeof window !== 'undefined' ? window.confirm('Are you sure you want to delete this user?') : false;
+    if (!confirmed) return;
+
+    setError('');
+    setDeletingId(userId);
+    try {
+      const res = await fetch(`/api/user/${userId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = (await res.json().catch(() => null)) as { msg?: string; status?: number } | null;
+      if (res.status === 200) {
+        setUsers((prev) => prev.filter((u) => u.id !== userId));
+      } else if (res.status === 401) {
+        router.push('/');
+        return;
+      } else {
+        setError(data?.msg || `Failed to delete user (status ${res.status})`);
+      }
+    } catch (err) {
+      setError('Connection error');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black via-neutral-950 to-neutral-900 px-6 text-amber-50">
@@ -117,19 +151,19 @@ export default function UsersPage() {
                     <td className="px-4 py-3">{new Date(u.created_at).toLocaleString()}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => console.log('edit', u.id)}
+                        <Link
+                          href={`/user/${u.id}`}
                           className="rounded-full border border-amber-400/40 px-3 py-1 text-xs font-semibold text-amber-100 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-400/20"
                         >
                           Edit
-                        </button>
+                        </Link>
                         <button
                           type="button"
-                          onClick={() => console.log('delete', u.id)}
-                          className="rounded-full border border-red-400/40 px-3 py-1 text-xs font-semibold text-red-100 transition hover:-translate-y-0.5 hover:border-red-300 hover:bg-red-500/20"
+                          onClick={() => handleDelete(u.id)}
+                          disabled={deletingId === u.id}
+                          className="rounded-full border border-red-400/40 px-3 py-1 text-xs font-semibold text-red-100 transition hover:-translate-y-0.5 hover:border-red-300 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                          Delete
+                          {deletingId === u.id ? 'Deleting…' : 'Delete'}
                         </button>
                       </div>
                     </td>
