@@ -115,12 +115,44 @@ if (isset($_POST['submit'])) {
 <html>
 <head>
     <title>Login - Hounty Bunter</title>
-    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css">
+    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css?v=3">
+    <style>
+        .login-container {
+            background: #0f0f0f;
+            border: 1px solid #1f1f1f;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+        }
+        .logo h1 {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .logo .brand-main {
+            color: #f7f7f7;
+        }
+        .logo .brand-tag {
+            background: #f6b700;
+            color: #0a0a0a;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+        }
+        .login-container .form-group input {
+            background: #161616;
+            border: 1px solid #2a2a2a;
+            color: #f7f7f7;
+        }
+        .login-container .form-group input:focus {
+            border-color: #f6b700;
+            box-shadow: 0 0 0 3px rgba(246, 183, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
         <div class="logo">
-            <h1>Hounty Bunter</h1>
+            <h1><span class="brand-main">Hounty</span><span class="brand-tag">Bunter</span></h1>
             <p>Welcome back! Please sign in</p>
         </div>
     <?php if ($login_status === 0 && !empty($msg)) { echo '<div class="form-message error">'.htmlspecialchars($msg).'</div>'; } ?>
