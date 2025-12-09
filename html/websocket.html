@@ -8,7 +8,7 @@
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script>
-    const socket = io('https://admin.hountybunter.click', {
+    const socket = io('https://admin.hountybunter.click/ws', {
       path: '/socket.io',
       transports: ['websocket'], // force ws if you want
     });
@@ -16,9 +16,13 @@
     socket.on('connect', () => {
       console.log('connected', socket.id);
     });
-
+    
+      socket.on('server-status', (data) => {
+        document.body.innerHTML += '<p>' + data.msg + '</p>';
+      });
     socket.on('response', (data) => {
       console.log('response', data);
     });
+    socket.emit('command', 'hello');
   </script>
 </html>

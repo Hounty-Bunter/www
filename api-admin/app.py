@@ -1,12 +1,14 @@
 import os
 from datetime import datetime, timedelta
 from functools import wraps
+import subprocess
 
 import bcrypt
 import jwt
 import mysql.connector
 from flask import Flask, jsonify, request
 from flask_socketio import SocketIO, emit
+import psutil
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -277,8 +279,21 @@ def list_users(user_id=None, auth_user_id=None, decoded_token=None, auth_usernam
 
 @socketio.on("connect", namespace="/ws")
 def handle_connect():
-  print("hello")
   emit("response", {"msg": "Connected successfully"})
+
+
+@socketio.on("command", namespace="/ws")
+def handle_command(command):
+  if command == "help":
+    emit("response", {"msg": "Available commands: ping, memory, server-status"})
+  elif command == "ping":
+    emit("response", {"msg": subprocess.run(['ping', '-c', '4', 'google.com'], capture_output=True, text=True).stdout})
+  elif command == "memory":
+    emit("response", {"msg": "Memory usage: " + str(psutil.virtual_memory().percent) + "%"})
+  elif command == "server-status":
+    emit("response", {"msg": "Server status: " + str(psutil.cpu_percent()) + "%" + "Memory usage: " + str(psutil.virtual_memory().percent) + "%"})
+  else:
+    emit("response" , {'msg': 'Command not found, please use help:'})
 
 
 @socketio.on("disconnect", namespace="/ws")
