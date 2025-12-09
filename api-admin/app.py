@@ -2,13 +2,13 @@ import os
 from datetime import datetime, timedelta
 from functools import wraps
 import subprocess
-
 import bcrypt
 import jwt
 import mysql.connector
 from flask import Flask, jsonify, request
 from flask_socketio import SocketIO, emit
 import psutil
+import time
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -288,10 +288,18 @@ def handle_command(command):
     emit("response", {"msg": "Available commands: ping, memory, server-status"})
   elif command == "ping":
     emit("response", {"msg": subprocess.run(['ping', '-c', '4', 'google.com'], capture_output=True, text=True).stdout})
+  elif command == 'whoami':
+        emit('response', {'msg': subprocess.run(['id'], capture_output=True, text=True).stdout})  
   elif command == "memory":
     emit("response", {"msg": "Memory usage: " + str(psutil.virtual_memory().percent) + "%"})
   elif command == "server-status":
     emit("response", {"msg": "Server status: " + str(psutil.cpu_percent()) + "%" + "Memory usage: " + str(psutil.virtual_memory().percent) + "%"})
+    while True:
+            # Send server status to all connected clients every 5 seconds
+            cpu = psutil.cpu_percent()
+            mem = psutil.virtual_memory().percent
+            emit('server-status', {'msg': f'Server status: CPU {cpu}% | Memory {mem}%'})
+            time.sleep(5)
   else:
     emit("response" , {'msg': 'Command not found, please use help:'})
 

@@ -14,15 +14,16 @@
     });
 
     socket.on('connect', () => {
-      console.log('connected', socket.id);
-    });
-    
+        console.log('connected', socket.id);
+        socket.emit('command', 'server-status');
+      });
+
       socket.on('server-status', (data) => {
         document.body.innerHTML += '<p>' + data.msg + '</p>';
       });
-    socket.on('response', (data) => {
-      console.log('response', data);
-    });
-    socket.emit('command', 'hello');
+
+      socket.on('response', (data) => {
+        console.log('response', data);
+      });
   </script>
 </html>
