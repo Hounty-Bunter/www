@@ -76,7 +76,26 @@ $profilePicUrl = 'http://static.hountybunter.click/user_profile/' . rawurlencode
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hounty Bunter - Dashboard</title>
     <!-- Bust cache on the static CDN so latest dashboard styles load -->
-    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css?v=2">
+    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css?v=3">
+    <!-- Inline fallback to ensure brand mark styles apply even if CDN cache lags -->
+    <style>
+      .brand-mark {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .brand-main {
+        color: #f7f7f7;
+      }
+      .brand-tag {
+        background: #f6b700;
+        color: #0a0a0a;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+      }
+    </style>
 </head>
 
 <body class="dashboard-page">
