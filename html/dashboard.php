@@ -64,9 +64,16 @@ $isGoogle     = isset($_SESSION['oauth_provider']) && $_SESSION['oauth_provider'
 $displayName  = $isGoogle ? ($_SESSION['google_name'] ?? $_SESSION['username']) : $_SESSION['username'];
 $displayEmail = $isGoogle ? ($_SESSION['google_email'] ?? '') : ($user['email'] ?? '');
 
-// Profile picture URL
-$profilePicFilename = $user['profile_picture'] ?? 'default.png';
-$profilePicUrl = 'http://static.hountybunter.click/user_profile/' . rawurlencode($profilePicFilename);
+// Profile picture URL (supports stored URLs or local filenames)
+function buildProfilePicUrl(?string $profilePic): string
+{
+    if (!empty($profilePic) && preg_match('#^https?://#i', $profilePic)) {
+        return $profilePic;
+    }
+    $filename = $profilePic ?: 'default.png';
+    return 'http://static.hountybunter.click/user_profile/' . rawurlencode($filename);
+}
+$profilePicUrl = buildProfilePicUrl($user['profile_picture'] ?? null);
 ?>
 
 <!DOCTYPE html>

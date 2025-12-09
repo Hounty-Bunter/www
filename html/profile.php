@@ -20,9 +20,16 @@ if (!$user) {
     die("User not found.");
 }
 
-// Profile picture URL
-$profilePicFilename = $user['profile_picture'] ?? 'default.png'; // Default to 'default.png' if not set
-$profilePicUrl = 'http://static.hountybunter.click/user_profile/' . rawurlencode($profilePicFilename);
+// Profile picture URL builder (supports stored URLs and local filenames)
+function buildProfilePicUrl(?string $profilePic): string
+{
+    if (!empty($profilePic) && preg_match('#^https?://#i', $profilePic)) {
+        return $profilePic;
+    }
+    $filename = $profilePic ?: 'default.png';
+    return 'http://static.hountybunter.click/user_profile/' . rawurlencode($filename);
+}
+$profilePicUrl = buildProfilePicUrl($user['profile_picture'] ?? null);
 
 // Optionally, you can print the profilePicUrl to check if it's correct
 // echo $profilePicUrl; // Uncomment to debug and verify the URL
@@ -83,8 +90,7 @@ $tweets_stmt->close();
         <div class="profile-card">
             <!-- Profile Picture -->
             <?php
-                $apiProfilePicFilename = $user_info['profile_picture'] ?? 'default.png';
-                $apiProfilePicUrl = 'http://static.hountybunter.click/user_profile/' . rawurlencode($apiProfilePicFilename);
+                $apiProfilePicUrl = buildProfilePicUrl($user_info['profile_picture'] ?? null);
             ?>
             <img class="avatar" src="<?php echo htmlspecialchars($apiProfilePicUrl); ?>" alt="Profile Picture">
             <div class="profile-card-info">

@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             tweetBtn.disabled = false;
                             tweetBtn.innerHTML = 'Post Tweet';
                             tweetInput.value = '';
-                            loadTweets(); // refresh list without reloading page/console
+                            window.location.reload(); // reload so the new tweet shows immediately
                         } else {
                             window.postMessage({ error: (data && data.message) || 'Failed to post tweet.' }, '*');
                             tweetBtn.disabled = false;

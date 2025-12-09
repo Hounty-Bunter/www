@@ -179,6 +179,12 @@ if (isset($_POST['submit'])) {
             
             <button type="submit" name="submit" class="submit-btn">Create Account</button>
 </form>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="google-login.php">
+                <button class="submit-btn" style="background: #DB4437;">Register with Google</button>
+            </a>
+        </div>
         
         <div class="login-link">
             <p>Already have an account?</p>

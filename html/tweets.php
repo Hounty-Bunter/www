@@ -2,6 +2,15 @@
 session_start();
 require_once 'mysql.php';
 
+function buildProfilePicUrl(?string $profilePic): string
+{
+    if (!empty($profilePic) && preg_match('#^https?://#i', $profilePic)) {
+        return $profilePic;
+    }
+    $filename = $profilePic ?: 'default.png';
+    return 'https://static.hountybunter.click/user_profile/' . rawurlencode($filename);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
 
@@ -59,7 +68,7 @@ while ($stmt->fetch()) {
         'created_at' => $createdAt,
         'created_human' => $createdHuman,
         'profile_picture' => $profilePic,
-        'profile_picture_url' => 'https://static.hountybunter.click/user_profile/' . rawurlencode($profilePic),
+        'profile_picture_url' => buildProfilePicUrl($profilePic),
     ];
 }
 $stmt->close();

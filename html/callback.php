@@ -29,17 +29,19 @@ try {
     $name = $userInfo->name;
     $google_id = $userInfo->id;
     $picture = $userInfo->picture; // Google profile photo URL
-//from here
+
     // ✅ DB: Find/Create User
     $stmt = $conn->prepare("SELECT id, username FROM users WHERE email = ? OR google_id = ?");
     $stmt->bind_param("ss", $email, $google_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
+    $userId = null;
     if ($row = $result->fetch_assoc()) {
         // Update
-        $update = $conn->prepare("UPDATE users SET google_id = ?, email = ? WHERE id = ?");
-        $update->bind_param("ssi", $google_id, $email, $row['id']);
+        $userId = $row['id'];
+        $update = $conn->prepare("UPDATE users SET google_id = ?, email = ?, profile_picture = ? WHERE id = ? LIMIT 1");
+        $update->bind_param("sssi", $google_id, $email, $picture, $userId);
         $update->execute();
     } else {
         // New: Unique username
@@ -55,15 +57,17 @@ try {
         }
 //to here
         $dummy_pass = password_hash('google_' . $google_id, PASSWORD_DEFAULT);
-        $insert = $conn->prepare("INSERT INTO users (username, email, password, google_id) VALUES (?, ?, ?, ?)");
-        $insert->bind_param("ssss", $username, $email, $dummy_pass, $google_id);
+        $insert = $conn->prepare("INSERT INTO users (username, email, password, google_id, profile_picture) VALUES (?, ?, ?, ?, ?)");
+        $insert->bind_param("sssss", $username, $email, $dummy_pass, $google_id, $picture);
         $insert->execute();
+        $userId = $insert->insert_id;
         $row['username'] = $username;
     }
 
     // ✅ Session match با login.php + store Google details
     $_SESSION['logged_in'] = true;
     $_SESSION['username'] = $row['username'];
+    $_SESSION['user_id'] = $userId;
     $_SESSION['oauth_provider'] = 'google';
     $_SESSION['google_name'] = $name;
     $_SESSION['google_email'] = $email;
