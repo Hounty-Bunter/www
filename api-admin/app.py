@@ -6,8 +6,10 @@ import bcrypt
 import jwt
 import mysql.connector
 from flask import Flask, jsonify, request
+from flask_sock import Sock
 
 app = Flask(__name__)
+sock = Sock(app)
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "hounty")
@@ -271,6 +273,19 @@ def list_users(user_id=None, auth_user_id=None, decoded_token=None, auth_usernam
       pass
 
   return jsonify({"status": 200, "users": users}), 200
+
+
+@sock.route("/ws")
+def ws_echo(ws):
+  """
+  Simple WebSocket endpoint that logs any incoming message and replies with 'hello'.
+  """
+  while True:
+    msg = ws.receive()
+    if msg is None:
+      break  # client closed
+    app.logger.info("WebSocket message: %s", msg)
+    ws.send("hello")
 
 
 if __name__ == "__main__":
