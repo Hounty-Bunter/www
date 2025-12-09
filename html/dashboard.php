@@ -75,7 +75,8 @@ $profilePicUrl = 'http://static.hountybunter.click/user_profile/' . rawurlencode
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hounty Bunter - Dashboard</title>
-    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css">
+    <!-- Bust cache on the static CDN so latest dashboard styles load -->
+    <link rel="stylesheet" href="https://static.hountybunter.click/styles.css?v=2">
 </head>
 
 <body class="dashboard-page">
@@ -170,4 +171,3 @@ $profilePicUrl = 'http://static.hountybunter.click/user_profile/' . rawurlencode
 
 </body>
 </html>
-
