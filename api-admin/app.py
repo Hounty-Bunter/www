@@ -6,10 +6,10 @@ import bcrypt
 import jwt
 import mysql.connector
 from flask import Flask, jsonify, request
-from flask_sock import Sock
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
-sock = Sock(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "hounty")
@@ -275,18 +275,16 @@ def list_users(user_id=None, auth_user_id=None, decoded_token=None, auth_usernam
   return jsonify({"status": 200, "users": users}), 200
 
 
-@sock.route("/ws")
-def ws_echo(ws):
-  """
-  Simple WebSocket endpoint that logs any incoming message and replies with 'hello'.
-  """
-  while True:
-    msg = ws.receive()
-    if msg is None:
-      break  # client closed
-    app.logger.info("WebSocket message: %s", msg)
-    ws.send("hello")
+@socketio.on("connect", namespace="/ws")
+def handle_connect():
+  print("hello")
+  emit("response", {"msg": "Connected successfully"})
+
+
+@socketio.on("disconnect", namespace="/ws")
+def handle_disconnect():
+  print("Client disconnected")
 
 
 if __name__ == "__main__":
-  app.run(host="127.0.0.1", port=5000, debug=True)
+  socketio.run(app, host="127.0.0.1", port=5000, debug=True)

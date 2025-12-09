@@ -3,4 +3,4 @@ flask-cors
 mysql-connector-python
 bcrypt
 PyJWT
-flask-sock
+flask-socketio
