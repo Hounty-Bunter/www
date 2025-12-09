@@ -329,13 +329,17 @@ def handle_command(command):
   elif command == "memory":
     emit("response", {"msg": "Memory usage: " + str(psutil.virtual_memory().percent) + "%"})
   elif command == "server-status":
-    emit("response", {"msg": "Server status: " + str(psutil.cpu_percent()) + "%" + "Memory usage: " + str(psutil.virtual_memory().percent) + "%"})
+    cpu = psutil.cpu_percent()
+    mem = psutil.virtual_memory().percent
+    now = datetime.utcnow().isoformat()
+    emit("response", {"msg": f"Server status: CPU {cpu}% | Memory {mem}%", "cpu": cpu, "memory": mem, "timestamp": now})
     while True:
-            # Send server status to all connected clients every 5 seconds
-            cpu = psutil.cpu_percent()
-            mem = psutil.virtual_memory().percent
-            emit('server-status', {'msg': f'Server status: CPU {cpu}% | Memory {mem}%'})
-            time.sleep(5)
+      # Send server status to all connected clients every 5 seconds
+      cpu = psutil.cpu_percent()
+      mem = psutil.virtual_memory().percent
+      now = datetime.utcnow().isoformat()
+      emit("server-status", {"msg": f"Server status: CPU {cpu}% | Memory {mem}%", "cpu": cpu, "memory": mem, "timestamp": now})
+      time.sleep(5)
   else:
     emit("response" , {'msg': 'Command not found, please use help:'})
 
