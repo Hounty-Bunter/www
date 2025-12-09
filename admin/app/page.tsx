@@ -48,9 +48,9 @@ export default function Login() {
   return (
      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-800 to-black px-4 text-zinc-50">
       <div className="absolute left-1/2 top-12 -translate-x-1/2">
-        <div className="flex items-center gap-1 rounded-full bg-black/60 px-3 py-1 text-sm font-semibold shadow-lg ring-1 ring-white/10">
+        <div className="flex items-center gap-2 rounded-full px-4 py-2 text-base font-semibold shadow-lg ring-1 ring-white/15">
           <span className="text-white">Hounty</span>
-          <span className="rounded-md bg-amber-400 px-2 py-1 text-black">Bunter</span>
+          <span className="rounded-md bg-amber-400 px-3 py-1 text-black">Bunter</span>
         </div>
       </div>
 
@@ -103,9 +103,6 @@ export default function Login() {
             {loading ? "Signing in..." : "Login"}
           </button>
         </form>
-
-        <div className="mt-8 rounded-lg border border-white/5 bg-white/5 p-4 text-xs text-zinc-400">
-        </div>
       </div>
     </div>
   );
