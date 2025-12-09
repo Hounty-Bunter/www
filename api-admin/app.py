@@ -6,7 +6,7 @@ import bcrypt
 import jwt
 import mysql.connector
 from flask import Flask, jsonify, request
-from flask_socketio import SocketIO, emit
+from flask_socketio import ConnectionRefusedError, SocketIO, disconnect, emit
 import psutil
 import time
 
@@ -20,6 +20,7 @@ DB_NAME = os.getenv("DB_NAME", "myapp")
 JWT_SECRET = os.getenv("JWT_SECRET", "change-me")
 JWT_EXP_HOURS = int(os.getenv("JWT_EXP_HOURS", "1"))
 JWT_ALG = "HS256"
+socket_clients = {}
 
 
 def get_db_conn():
@@ -80,6 +81,9 @@ def _get_auth_token() -> str | None:
   auth_header = request.headers.get("Authorization", "")
   if auth_header.lower().startswith("bearer "):
     return auth_header.split(" ", 1)[1].strip() or None
+  token_param = request.args.get("token")
+  if token_param:
+    return token_param.strip() or None
   return None
 
 
@@ -118,6 +122,25 @@ def require_auth(fn):
     return fn(*args, **kwargs)
 
   return wrapper
+
+
+def _require_socket_auth():
+  raw_token = _get_auth_token()
+  payload, error_response = _decode_token(raw_token)
+  if error_response:
+    try:
+      message = error_response[0].json.get("msg", "Unauthorized")
+    except Exception:
+      message = "Unauthorized"
+    raise ConnectionRefusedError(message)
+  return payload
+
+
+def _get_socket_auth_payload():
+  payload = socket_clients.get(request.sid)
+  if payload is None:
+    raise ConnectionRefusedError("Unauthorized")
+  return payload
 
 
 @app.route("/user/me", methods=["GET"])
@@ -279,11 +302,24 @@ def list_users(user_id=None, auth_user_id=None, decoded_token=None, auth_usernam
 
 @socketio.on("connect", namespace="/ws")
 def handle_connect():
+  try:
+    payload = _require_socket_auth()
+  except ConnectionRefusedError as exc:
+    app.logger.warning("Socket connect refused: %s", exc)
+    return False
+
+  socket_clients[request.sid] = payload
   emit("response", {"msg": "Connected successfully"})
 
 
 @socketio.on("command", namespace="/ws")
 def handle_command(command):
+  try:
+    _ = _get_socket_auth_payload()
+  except ConnectionRefusedError:
+    disconnect()
+    return
+
   if command == "help":
     emit("response", {"msg": "Available commands: ping, memory, server-status"})
   elif command == "ping":
@@ -306,6 +342,7 @@ def handle_command(command):
 
 @socketio.on("disconnect", namespace="/ws")
 def handle_disconnect():
+  socket_clients.pop(request.sid, None)
   print("Client disconnected")
 
 

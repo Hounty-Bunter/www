@@ -24,6 +24,13 @@ export default function PanelPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+    }
+    router.push('/');
+  };
+
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) {
@@ -74,9 +81,18 @@ export default function PanelPage() {
             <p className="text-xs uppercase tracking-[0.22em] text-amber-400">Panel</p>
             <h1 className="mt-1 text-3xl font-bold text-white">Account overview</h1>
           </div>
-          <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-200">
-            {loading ? 'Loading' : user ? 'Authenticated' : 'Guest'}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-200">
+              {loading ? 'Loading' : user ? 'Authenticated' : 'Guest'}
+            </span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-full border border-amber-400/60 bg-amber-500/15 px-4 py-2 text-xs font-semibold text-amber-100 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-400/25"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="mb-8 flex flex-wrap gap-3">
@@ -117,18 +133,18 @@ export default function PanelPage() {
               <p className="mt-1 text-lg font-semibold text-white">{user.username}</p>
             </div>
             <div className="rounded-xl border border-amber-500/30 bg-white/5 p-4 shadow-inner">
-              <p className="text-xs uppercase tracking-[0.12em] text-amber-200/80">Email</p>
-              <p className="mt-1 text-lg font-semibold text-white">{user.email}</p>
-            </div>
-            <div className="rounded-xl border border-amber-500/30 bg-white/5 p-4 shadow-inner">
               <p className="text-xs uppercase tracking-[0.12em] text-amber-200/80">User ID</p>
               <p className="mt-1 text-lg font-semibold text-white">{user.id}</p>
+            </div>
+            <div className="rounded-xl border border-amber-500/30 bg-white/5 p-4 shadow-inner md:col-span-2">
+              <p className="text-xs uppercase tracking-[0.12em] text-amber-200/80">Email</p>
+              <p className="mt-1 text-lg font-semibold text-white">{user.email}</p>
             </div>
             <div className="rounded-xl border border-amber-500/30 bg-white/5 p-4 shadow-inner">
               <p className="text-xs uppercase tracking-[0.12em] text-amber-200/80">Created</p>
               <p className="mt-1 text-lg font-semibold text-white">{formatDate(user.created_at)}</p>
             </div>
-            <div className="rounded-xl border border-amber-500/30 bg-white/5 p-4 shadow-inner md:col-span-2">
+            <div className="rounded-xl border border-amber-500/30 bg-white/5 p-4 shadow-inner">
               <p className="text-xs uppercase tracking-[0.12em] text-amber-200/80">Updated</p>
               <p className="mt-1 text-lg font-semibold text-white">{formatDate(user.updated_at)}</p>
             </div>

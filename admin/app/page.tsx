@@ -47,6 +47,13 @@ export default function Login() {
 
   return (
      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-800 to-black px-4 text-zinc-50">
+      <div className="absolute left-1/2 top-12 -translate-x-1/2">
+        <div className="flex items-center gap-1 rounded-full bg-black/60 px-3 py-1 text-sm font-semibold shadow-lg ring-1 ring-white/10">
+          <span className="text-white">Hounty</span>
+          <span className="rounded-md bg-amber-400 px-2 py-1 text-black">Bunter</span>
+        </div>
+      </div>
+
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-10 shadow-2xl backdrop-blur">
         <div className="mb-8 space-y-2 text-center">
           <p className="text-sm uppercase tracking-[0.2em] text-amber-400">
@@ -98,8 +105,6 @@ export default function Login() {
         </form>
 
         <div className="mt-8 rounded-lg border border-white/5 bg-white/5 p-4 text-xs text-zinc-400">
-          <p>Demo credentials:</p>
-          <p className="mt-1 font-semibold text-white">admin / password123</p>
         </div>
       </div>
     </div>
