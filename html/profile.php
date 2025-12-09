@@ -75,6 +75,9 @@ $tweets_stmt->close();
 <body class="profile-page">
 
 <div class="profile-container">
+    <div class="profile-actions">
+        <a class="btn ghost" href="index.php">Back to tweets</a>
+    </div>
     <div class="profile-layout">
         <!-- Profile card -->
         <div class="profile-card">

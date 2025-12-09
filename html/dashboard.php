@@ -106,6 +106,9 @@ $profilePicUrl = 'http://static.hountybunter.click/user_profile/' . rawurlencode
     <div class="welcome-section">
         <h1 class="brand-mark"><span class="brand-main">Hounty</span><span class="brand-tag">Bunter</span></h1>
     </div>
+    <div class="dashboard-actions">
+        <a class="btn ghost" href="index.php">Back to tweets</a>
+    </div>
 
     <!-- Profile Card -->
     <div class="profile">

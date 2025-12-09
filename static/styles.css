@@ -921,6 +921,12 @@ body.profile-page {
     max-width: 1200px;
     margin: 0 auto;
   }
+
+  .profile-actions,
+  .dashboard-actions {
+    text-align: center;
+    margin-bottom: 18px;
+  }
   
   .profile-layout {
     display: grid;
